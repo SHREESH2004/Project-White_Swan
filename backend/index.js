@@ -1,8 +1,7 @@
-import e from "express";
-import { configDotenv } from "dotenv";
-const app = e();
-configDotenv();
+import app from "./app.js";
+import { ServerConfig ,logger} from "./config/index.js";
 const Port=process.env.PORT;
-app.listen(Port, () => {
+app.listen(ServerConfig.PORT, () => {
     console.log("Server running on port",Port);
+    logger.info("Successfully started the server");
 });

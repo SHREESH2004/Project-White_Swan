@@ -1,0 +1,115 @@
+# ✈️ Scalable Backend for Airline Management System
+
+This project is a scalable backend solution built for **airline companies** to efficiently manage their complete operations, including flight scheduling, booking, fleet and crew management, and more. Developed using the MERN architecture (with SQL replacing MongoDB), this backend is designed for **robust performance, easy scaling, and seamless integration**.
+
+---
+
+## 🚀 Key Features
+
+* 🗓️ **Flight Management** – Create, update, and schedule flights
+* 🎫 **Booking System** – Passenger booking and ticket management
+* 🛩️ **Fleet Maintenance** – Manage aircraft data and maintenance logs
+* 👨‍✈️ **Crew Management** – Assign and track crew schedules
+* 💳 **Payments Integration** – Payment processing endpoints
+* 🔒 **Authentication & Roles** – Secure login and role-based access
+* 📊 **Reports & Analytics** – Admin dashboards and summaries
+* 🔌 **RESTful API** – Easy integration with frontend & third-party systems
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer    | Technology              |
+| -------- | ----------------------- |
+| Backend  | Node.js, Express.js     |
+| Database | PostgreSQL / MySQL      |
+| Auth     | JWT (JSON Web Tokens)   |
+| DevOps   | Docker (optional), PM2  |
+| Testing  | Jest / Mocha (optional) |
+
+---
+
+## 📁 Project Structure
+
+```
+/src
+  /controllers     // Route logic
+  /models          // SQL models using Sequelize / Knex / Prisma
+  /routes          // Express routes
+  /middleware      // Auth and error handling
+  /config          // DB and environment configs
+  /utils           // Helper functions
+```
+
+---
+
+## ⚙️ Getting Started
+
+### 1. Clone the repo
+
+```bash
+git clone https://github.com/your-org/airline-backend.git
+cd airline-backend
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Configure environment variables
+
+```bash
+cp .env.example .env
+```
+
+Fill in values like DB credentials, JWT secret, etc.
+
+### 4. Run development server
+
+```bash
+npm run dev
+```
+
+---
+
+## 🧪 Example API Endpoints
+
+* `GET /api/flights` – Get list of available flights
+* `POST /api/bookings` – Book a flight
+* `PUT /api/fleet/:id` – Update aircraft info
+* `POST /api/auth/login` – Login and get JWT token
+
+---
+
+## 📌 Roadmap
+
+* [ ] Add airline alliance/multi-airline support
+* [ ] Real-time flight tracking via WebSocket
+* [ ] Dynamic ticket pricing
+* [ ] Integrate admin analytics dashboard
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request.
+
+---
+
+## 📄 License
+
+Licensed under the [MIT License](LICENSE).
+
+---
+
+Let me know if you're using **Sequelize**, **Knex**, or **Prisma** for SQL integration — I can include more details based on that.
+
+npx sequelize init
+will create config.json
+fro you 
+to get migrations or seeder folder and models folder
+
+to run the server:
+npx nodemom
