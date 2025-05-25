@@ -3,11 +3,6 @@ import { Model } from 'sequelize';
 
 export default (sequelize, DataTypes) => {
   class AirPlane extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
       // define association here
     }
@@ -17,14 +12,21 @@ export default (sequelize, DataTypes) => {
     ModelNo: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true  // Add uniqueness constraint
     },
     capacity: {
       type: DataTypes.INTEGER,
-      defaultValue:0,
-    },
+      allowNull: false,
+      defaultValue: 0,
+      validate: {
+        min: 0,
+        max: 1000
+      }
+    }
   }, {
     sequelize,
     modelName: 'AirPlane',
+    tableName: 'AirPlanes', // Explicit table name to match your migration
     timestamps: true
   });
 

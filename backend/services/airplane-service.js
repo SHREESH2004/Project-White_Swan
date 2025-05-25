@@ -10,8 +10,13 @@ class AirplaneService {
             return airplane;
         } catch (error) {
             console.error("Error in AirplaneService: create", error);
-
-            // Sequelize unique constraint error
+            if (error.name === "SequelizeValidationError") {
+                throw {
+                    statusCode: 400,
+                    message: "Max Capacity limit crossed(Max:1000)",
+                    explanation: error.errors.map(e => e.message),
+                };
+            }
             if (error.name === "SequelizeUniqueConstraintError") {
                 throw {
                     statusCode: 400,
@@ -34,6 +39,7 @@ class AirplaneService {
             };
         }
     }
+
 
 }
 
