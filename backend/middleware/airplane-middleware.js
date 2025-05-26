@@ -1,16 +1,31 @@
+import { body, validationResult } from "express-validator";
 import { StatusCodes } from "http-status-codes";
-import AppError from "../utils/api-error.js";
 import { error_response } from "../utils/common/error-response.js";
 
-function validateCreateRequest(req, res, next) {
-    const { ModelNo } = req.body;
+const validateCreateAirplane = [
+  body("ModelNo")
+    .trim()
+    .notEmpty().withMessage("ModelNo is required and must be a non-empty string.")
+    .matches(/^[a-zA-Z0-9\-_]+$/)
+    .withMessage("ModelNo must only contain letters, numbers, hyphens (-), or underscores (_)."),
 
-    if (!ModelNo || typeof ModelNo !== 'string' || ModelNo.trim() === "") {
-        const error = new AppError("ModelNo is required and must be a non-empty string.", StatusCodes.BAD_REQUEST);
-        return error_response(res, error);
+  body("capacity")
+    .trim()
+    .notEmpty().withMessage("Capacity is required.")
+    .isInt().withMessage("Capacity must be an integer."),
+
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const explanation = errors.array().map(err => err.msg);
+      return error_response(res, {
+        message: "Input validation failed",
+        statusCode: StatusCodes.BAD_REQUEST,
+        explanation
+      });
     }
+    next();
+  }
+];
 
-    next(); 
-}
-
-export default validateCreateRequest;
+export default validateCreateAirplane;
