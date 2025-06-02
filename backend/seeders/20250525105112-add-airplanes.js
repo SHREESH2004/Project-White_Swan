@@ -4,7 +4,7 @@
 export async function up(queryInterface, Sequelize) {
 
     await queryInterface.bulkInsert('AirPlanes', [{
-      ModelNo: 'Boeing327',
+      ModelNo: 'Boeing337',
       capacity:900
     }], {});
 }

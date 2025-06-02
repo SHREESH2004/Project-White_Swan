@@ -1,32 +1,12 @@
+// services/airplane-service.js
 import { AirPlanesRepo } from "../repositories/airplane-repositories.js";
 
 class AirplaneService {
-    constructor() {
-        this.airplaneRepo = new AirPlanesRepo();
+    constructor(airplaneRepo = new AirPlanesRepo()) {
+        this.airplaneRepo = airplaneRepo;
     }
-
-    validateInput(data) {
-        const errors = [];
-
-        if (!/^\d+$/.test(data.capacity)) {
-            errors.push("Capacity must contain digits only. No letters or special characters allowed.");
-        }
-
-        if (!/^[a-zA-Z0-9-_]+$/.test(data.modelNumber)) {
-            errors.push("Model number must contain only letters, numbers, hyphens, or underscores. No other special characters allowed.");
-        }
-
-        if (errors.length > 0) {
-            const error = new Error("Validation Error");
-            error.name = "CustomValidationError";
-            error.explanation = errors;
-            throw error;
-        }
-    }
-
     async create(data) {
         try {
-            this.validateInput(data);
             const airplane = await this.airplaneRepo.create(data);
             return airplane;
         } catch (error) {
@@ -43,7 +23,7 @@ class AirplaneService {
             if (error.name === "SequelizeValidationError") {
                 throw {
                     statusCode: 400,
-                    message: "Max Capacity limit crossed (Max:1000)",
+                    message: "Validation error from database",
                     explanation: error.errors.map(e => e.message),
                 };
             }
@@ -51,7 +31,7 @@ class AirplaneService {
             if (error.name === "SequelizeUniqueConstraintError") {
                 throw {
                     statusCode: 400,
-                    message: "Duplicate entry: Model number must be unique.",
+                    message: "Duplicate entry: ModelNo must be unique.",
                     explanation: error.errors.map(e => e.message),
                 };
             }
@@ -71,6 +51,92 @@ class AirplaneService {
             };
         }
     }
+
+    async get(id) {
+        try {
+            if (!id || isNaN(Number(id))) {
+                throw {
+                    statusCode: 400,
+                    message: "Invalid ID format",
+                    explanation: "The airplane ID must be a valid number.",
+                };
+            }
+
+            const airplane = await this.airplaneRepo.get(id);
+
+            if (!airplane) {
+                throw {
+                    statusCode: 404,
+                    message: "Airplane not found",
+                    explanation: `No airplane found with ID ${id}`,
+                };
+            }
+
+            return airplane;
+        } catch (error) {
+            if (error.statusCode) throw error;
+
+            console.error("Error in AirplaneService: get", error);
+            throw {
+                statusCode: 500,
+                message: "Unable to fetch airplane",
+                explanation: error.message || "Something went wrong",
+            };
+        }
+    }
+async getAll() {
+    try {
+        const airplanes = await this.airplaneRepo.getAll();
+
+        // Check if any airplanes were returned
+        if (!airplanes || airplanes.length === 0) {
+            throw {
+                statusCode: 404,
+                message: "No airplanes found",
+                explanation: "There are no airplanes in the database.",
+            };
+        }
+
+        return airplanes;
+    } catch (error) {
+        // If error already has a statusCode, it’s a controlled error, re-throw it
+        if (error.statusCode) throw error;
+
+        console.error("Error in AirplaneService: getall", error);
+
+        // Generic server error
+        throw {
+            statusCode: 500,
+            message: "Unable to fetch airplanes",
+            explanation: error.message || "Something went wrong while fetching airplane data.",
+        };
+    }
+}
+    async destroy(id) {
+        try {
+            if (!id || isNaN(Number(id))) {
+                throw {
+                    statusCode: 400,
+                    message: "Invalid ID format",
+                    explanation: "The airplane ID must be a valid number.",
+                };
+            }
+
+            const airplane = await this.airplaneRepo.destroy(id);
+
+            return airplane;
+        } catch (error) {
+            if (error.statusCode) throw error;
+
+            console.error("Error in AirplaneService: destroy", error);
+            throw {
+                statusCode: 500,
+                message: "Unable to remove airplane",
+                explanation: error.message || "Something went wrong",
+            };
+        }
+    }
+
 }
 
 export default AirplaneService;
