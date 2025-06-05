@@ -50,6 +50,90 @@ class CityService {
             };
         }
     }
+    async get(id) {
+        try {
+            if (!id || isNaN(Number(id))) {
+                throw {
+                    statusCode: 400,
+                    message: "Invalid ID format",
+                    explanation: "The city ID must be a valid number.",
+                };
+            }
+
+            const city = await this.cityRepo.get(id);
+
+            if (!city) {
+                throw {
+                    statusCode: 404,
+                    message: "City not found",
+                    explanation: `No city found with ID ${id}`,
+                };
+            }
+
+            return city;
+        } catch (error) {
+            if (error.statusCode) throw error;
+
+            console.error("Error in CityService: get", error);
+            throw {
+                statusCode: 500,
+                message: "Unable to fetch cities",
+                explanation: error.message || "Something went wrong",
+            };
+        }
+    }
+    async getAll() {
+        try {
+            const cities = await this.cityRepo.getAll();
+
+            // Check if any airplanes were returned
+            if (!cities || cities.length === 0) {
+                throw {
+                    statusCode: 404,
+                    message: "No city found",
+                    explanation: "There are no cities in the database.",
+                };
+            }
+
+            return cities;
+        } catch (error) {
+            // If error already has a statusCode, it’s a controlled error, re-throw it
+            if (error.statusCode) throw error;
+
+            console.error("Error in cityService: getall", error);
+
+            // Generic server error
+            throw {
+                statusCode: 500,
+                message: "Unable to fetch cities",
+                explanation: error.message || "Something went wrong while fetching cities data.",
+            };
+        }
+    }
+    async destroy(id) {
+        try {
+            if (!id || isNaN(Number(id))) {
+                throw {
+                    statusCode: 400,
+                    message: "Invalid ID format",
+                    explanation: "The city ID must be a valid number.",
+                };
+            }
+
+            const city = await this.cityRepo.destroy(id);
+
+            return city;
+        } catch (error) {
+            if (error.statusCode) throw error;
+
+            console.error("Error in cityService: destroy", error);
+            throw {
+                statusCode: 500,
+                message: "Unable to remove cities",
+                explanation: error.message || "Something went wrong",
+            };
+        }
+    }
 
 }
 export default CityService

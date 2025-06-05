@@ -84,34 +84,34 @@ class AirplaneService {
             };
         }
     }
-async getAll() {
-    try {
-        const airplanes = await this.airplaneRepo.getAll();
+    async getAll() {
+        try {
+            const airplanes = await this.airplaneRepo.getAll();
 
-        // Check if any airplanes were returned
-        if (!airplanes || airplanes.length === 0) {
+            // Check if any airplanes were returned
+            if (!airplanes || airplanes.length === 0) {
+                throw {
+                    statusCode: 404,
+                    message: "No airplanes found",
+                    explanation: "There are no airplanes in the database.",
+                };
+            }
+
+            return airplanes;
+        } catch (error) {
+            // If error already has a statusCode, it’s a controlled error, re-throw it
+            if (error.statusCode) throw error;
+
+            console.error("Error in AirplaneService: getall", error);
+
+            // Generic server error
             throw {
-                statusCode: 404,
-                message: "No airplanes found",
-                explanation: "There are no airplanes in the database.",
+                statusCode: 500,
+                message: "Unable to fetch airplanes",
+                explanation: error.message || "Something went wrong while fetching airplane data.",
             };
         }
-
-        return airplanes;
-    } catch (error) {
-        // If error already has a statusCode, it’s a controlled error, re-throw it
-        if (error.statusCode) throw error;
-
-        console.error("Error in AirplaneService: getall", error);
-
-        // Generic server error
-        throw {
-            statusCode: 500,
-            message: "Unable to fetch airplanes",
-            explanation: error.message || "Something went wrong while fetching airplane data.",
-        };
     }
-}
     async destroy(id) {
         try {
             if (!id || isNaN(Number(id))) {
