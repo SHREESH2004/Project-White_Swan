@@ -1,4 +1,7 @@
 /** @type {import('sequelize-cli').Migration} */
+
+
+
 export default {
   async up(queryInterface, Sequelize) {
     await queryInterface.addConstraint('Airports', {
@@ -9,7 +12,6 @@ export default {
         table: 'Cities', // Adjust to match your actual table name
         field: 'id'
       },
-      onUpdate: 'CASCADE',
       onDelete: 'CASCADE'
     });
   },
