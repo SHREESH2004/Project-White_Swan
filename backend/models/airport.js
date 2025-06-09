@@ -8,10 +8,18 @@ export default (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      this.belongsTo(models.City,{
-        foreignKey:'cityId',
-        onDelete:'CASCADE',
-      })
+      this.belongsTo(models.City, {
+        foreignKey: 'cityId',
+        onDelete: 'CASCADE',
+      }),
+        this.hasMany(models.Flight, {
+          foreignKey: 'departureAirportId',
+          onDelete: 'CASCADE'
+        }),
+        this.hasMany(models.Flight, {
+          foreignKey: 'arrivalAirportId',
+          onDelete: 'CASCADE'
+        })
 
       // define association here
     }
