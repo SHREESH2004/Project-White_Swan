@@ -38,7 +38,7 @@ export default (sequelize, DataTypes) => {
     },
     address: {
       type: DataTypes.STRING,
-      unique: true
+      unique: true,
     },
     cityId: {
       type: DataTypes.INTEGER,

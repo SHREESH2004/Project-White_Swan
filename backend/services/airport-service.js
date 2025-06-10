@@ -45,6 +45,13 @@ class AirportService {
           explanation: error.parent.sqlMessage,
         };
       }
+      if (error.name === "SequelizeForeignKeyConstraintError") {
+        throw {
+          statusCode: 400,
+          message: "City-ID does not exist in database",
+          explanation: error.parent.sqlMessage,
+        };
+      }
 
       throw {
         statusCode: 500,
