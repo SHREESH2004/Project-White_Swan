@@ -38,12 +38,15 @@ export class CrudRepo {
         }
     }
 
-    async getAll(filter = {}) {
+    async getAll(filter = {}, sort = []) {
         try {
-            const res = await this.model.findAll(filter);
+            const res = await this.model.findAll({
+                where: filter,
+                order: sort
+            });
             return res;
         } catch (error) {
-            logger.error('Something went wrong in CrudRepo: getAll');
+            logger.error('Something went wrong in CrudRepo: getAll', error);
             throw error;
         }
     }

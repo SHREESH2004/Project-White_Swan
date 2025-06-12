@@ -89,6 +89,7 @@ class FlightService {
 
     async getAll(query) {
         const customFilter = {};
+        let sort=[]
 
         // Handle trips query
         if (query.trips && query.trips.includes('-')) {
@@ -181,18 +182,13 @@ class FlightService {
                 });
             }
         }
-
-
-
-
-
-
-
-
-
+        if (query.sort) {
+            const params = query.sort.split(',');
+            sort = params.map(param => param.split('_'));
+        }
 
         try {
-            const flights = await this.flightRepo.getAll({ where: customFilter });
+            const flights = await this.flightRepo.getAll(customFilter,sort);
 
             if (!flights || flights.length === 0) {
                 throw {
