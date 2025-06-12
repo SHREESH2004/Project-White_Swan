@@ -1,4 +1,6 @@
 import { FlightRepo } from "../repositories/flight-repositories.js";
+import { Op } from "sequelize";
+import dayjs from "dayjs";
 
 class FlightService {
     constructor(flightRepo = new FlightRepo()) {
@@ -85,28 +87,127 @@ class FlightService {
         }
     }
 
-    async getAll() {
+    async getAll(query) {
+        const customFilter = {};
+
+        // Handle trips query
+        if (query.trips && query.trips.includes('-')) {
+            const [departureAirportIdRaw, arrivalAirportIdRaw] = query.trips.trim().split('-');
+            const departureAirportId = departureAirportIdRaw?.trim();
+            const arrivalAirportId = arrivalAirportIdRaw?.trim();
+
+            if (departureAirportId && arrivalAirportId) {
+                customFilter.departureAirportId = departureAirportId;
+                customFilter.arrivalAirportId = arrivalAirportId;
+            }
+        }
+
+        // Handle price range query
+        if (query.price) {
+            const [minPriceRaw, maxPriceRaw] = query.price.trim().split('-');
+            const minPrice = minPriceRaw && !isNaN(Number(minPriceRaw.trim())) ? Number(minPriceRaw.trim()) : 0;
+
+            // Use 999999 if maxPriceRaw is missing or invalid
+            const maxPrice = maxPriceRaw && !isNaN(Number(maxPriceRaw.trim())) ? Number(maxPriceRaw.trim()) : 999999;
+
+            if (isNaN(minPrice) || isNaN(maxPrice)) {
+                throw {
+                    statusCode: 400,
+                    message: "Invalid price format",
+                    explanation: "Price should be in the format 'min-max' with numeric values.",
+                };
+            }
+
+            if (minPrice > maxPrice) {
+                throw {
+                    statusCode: 400,
+                    message: "Invalid price range",
+                    explanation: "Minimum price cannot be greater than maximum price.",
+                };
+            }
+
+            customFilter.price = {
+                [Op.between]: [minPrice, maxPrice]
+            };
+        }
+
+        // Handle travellers (seats) query
+        if (query.travellers) {
+            const travellers = Number(query.travellers);
+
+            if (isNaN(travellers) || travellers <= 0) {
+                throw {
+                    statusCode: 400,
+                    message: "Invalid travellers count",
+                    explanation: "Travellers must be a positive numeric value.",
+                };
+            }
+
+            customFilter.totalSeats = {
+                [Op.gte]: travellers
+            };
+        }
+
+        // Handle trip date query
+        if (query.tripdate) {
+            try {
+                const tripDate = query.tripdate;
+
+                // Validate format (basic YYYY-MM-DD format check)
+                const isValidFormat = /^\d{4}-\d{2}-\d{2}$/.test(tripDate);
+                if (!isValidFormat) {
+                    throw new Error(`Invalid date format for 'tripdate': ${tripDate}. Expected format is YYYY-MM-DD.`);
+                }
+
+                const startDate = new Date(`${tripDate}T00:00:00Z`);
+                const endDate = new Date(`${tripDate}T23:59:59Z`);
+
+                // Additional check for Invalid Date
+                if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                    throw new Error(`Could not parse 'tripdate': ${tripDate}`);
+                }
+
+                console.log('Searching flights between:', startDate.toISOString(), 'and', endDate.toISOString());
+
+                customFilter.departureTime = {
+                    [Op.between]: [startDate, endDate],
+                };
+
+            } catch (error) {
+                console.error('Error parsing tripdate:', error.message);
+                return res.status(400).json({
+                    success: false,
+                    message: `Invalid tripdate provided. ${error.message}`,
+                });
+            }
+        }
+
+
+
+
+
+
+
+
+
+
         try {
-            const flights = await this.flightRepo.getAll();
+            const flights = await this.flightRepo.getAll({ where: customFilter });
 
             if (!flights || flights.length === 0) {
                 throw {
                     statusCode: 404,
                     message: "No flights found",
-                    explanation: "There are no flights in the database.",
+                    explanation: "There are no flights matching the given search criteria.",
                 };
             }
 
             return flights;
         } catch (error) {
-            if (error.statusCode) throw error;
-
-            console.error("Error in FlightService: getAll", error);
-
             throw {
-                statusCode: 500,
-                message: "Unable to fetch flights",
-                explanation: error.message || "Something went wrong while fetching flight data.",
+                statusCode: error.statusCode || 500,
+                message: error.message || "Unable to fetch flights",
+                explanation: error.explanation || "Something went wrong while fetching flight data.",
             };
         }
     }

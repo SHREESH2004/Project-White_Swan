@@ -1,4 +1,4 @@
-import {logger} from "../config/logger-config.js"
+import { logger } from "../config/logger-config.js"
 export class CrudRepo {
     constructor(model) {
         this.model = model;
@@ -38,15 +38,16 @@ export class CrudRepo {
         }
     }
 
-    async getAll() {
+    async getAll(filter = {}) {
         try {
-            const res = await this.model.findAll();
+            const res = await this.model.findAll(filter);
             return res;
         } catch (error) {
             logger.error('Something went wrong in CrudRepo: getAll');
             throw error;
         }
     }
+
 
     async update(id, newData) {
         try {

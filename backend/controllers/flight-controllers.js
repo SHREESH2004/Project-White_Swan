@@ -42,7 +42,8 @@ async function getFlight(req, res) {
 // GET all flights
 async function getAllFlights(req, res) {
   try {
-    const flights = await flightService.getAll();
+    const flights = await flightService.getAll(req.query);
+    console.log(req.query);
     return success_response(res, "Flights fetched successfully", flights, 200);
   } catch (error) {
     console.error("Error in controller: getAllFlights", error.message);
