@@ -37,19 +37,20 @@ export class CrudRepo {
             throw error;
         }
     }
-
-    async getAll(filter = {}, sort = []) {
+    async getAll(filter = {}, sort = [], include = []) {
         try {
-            const res = await this.model.findAll({
+            const results = await this.model.findAll({
                 where: filter,
-                order: sort
+                order: sort,
+                include: include.length ? include : undefined  // Avoid empty include array
             });
-            return res;
+            return results;
         } catch (error) {
-            logger.error('Something went wrong in CrudRepo: getAll', error);
+            logger.error('Something went wrong in CrudRepo: getAll', { error });
             throw error;
         }
     }
+
 
 
     async update(id, newData) {

@@ -1,6 +1,6 @@
 import { FlightRepo } from "../repositories/flight-repositories.js";
-import { Op } from "sequelize";
-import dayjs from "dayjs";
+import { Op, Sequelize } from "sequelize";
+import db from '../models/index.js';
 
 class FlightService {
     constructor(flightRepo = new FlightRepo()) {
@@ -89,7 +89,7 @@ class FlightService {
 
     async getAll(query) {
         const customFilter = {};
-        let sort=[]
+        let sort = []
 
         // Handle trips query
         if (query.trips && query.trips.includes('-')) {
@@ -188,7 +188,23 @@ class FlightService {
         }
 
         try {
-            const flights = await this.flightRepo.getAll(customFilter,sort);
+            const flights = await this.flightRepo.getAll(
+                customFilter,
+                sort,
+                [{
+                    model: db.AirPlane,
+                    as: 'Flight Details',
+                    required: true
+                }, {
+                    model: db.Airport,
+                    as: 'Airport Details',
+                    required: true,
+                    /*on: {
+                        col: Sequelize.where(Sequelize.col('Flight.departureAirportId'), '=', Sequelize.col('Airport.code')),
+                    }*/
+                }]
+            );
+
 
             if (!flights || flights.length === 0) {
                 throw {

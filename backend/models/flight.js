@@ -4,17 +4,19 @@ import { Model } from 'sequelize';
 export default (sequelize, DataTypes) => {
   class Flight extends Model {
     static associate(models) {
-      // A Flight belongs to an AirPlane
       this.belongsTo(models.AirPlane, {
         foreignKey: 'airplaneId',
         onDelete: 'CASCADE',
+        as: 'Flight Details'
       });
+
 
       // Assuming Airport.code is used (string primary key)
       this.belongsTo(models.Airport, {
         foreignKey: 'departureAirportId',
         targetKey: 'code',
         onDelete: 'CASCADE',
+        as: 'Airport Details'
       });
 
       this.belongsTo(models.Airport, {
