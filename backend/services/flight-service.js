@@ -197,12 +197,20 @@ class FlightService {
                     required: true
                 }, {
                     model: db.Airport,
-                    as: 'Airport Details',
+                    as: 'Departure Airport Details',
                     required: true,
                     /*on: {
                         col: Sequelize.where(Sequelize.col('Flight.departureAirportId'), '=', Sequelize.col('Airport.code')),
                     }*/
-                }]
+                },
+                {
+                    model: db.Airport,
+                    as: 'Arrival Airport Details',
+                    required: true,
+                    /*on: {
+                        col: Sequelize.where(Sequelize.col('Flight.arrivalAirportId'), '=', Sequelize.col('Airport.code')),
+                    }*/
+        }]
             );
 
 

@@ -10,19 +10,19 @@ export default (sequelize, DataTypes) => {
         as: 'Flight Details'
       });
 
-
-      // Assuming Airport.code is used (string primary key)
+      
       this.belongsTo(models.Airport, {
         foreignKey: 'departureAirportId',
         targetKey: 'code',
         onDelete: 'CASCADE',
-        as: 'Airport Details'
+        as: 'Departure Airport Details'
       });
 
       this.belongsTo(models.Airport, {
         foreignKey: 'arrivalAirportId',
         targetKey: 'code',
         onDelete: 'CASCADE',
+        as: 'Arrival Airport Details'
       });
     }
   }
