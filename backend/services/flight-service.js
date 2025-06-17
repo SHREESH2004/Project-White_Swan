@@ -210,7 +210,7 @@ class FlightService {
                     /*on: {
                         col: Sequelize.where(Sequelize.col('Flight.arrivalAirportId'), '=', Sequelize.col('Airport.code')),
                     }*/
-        }]
+                }]
             );
 
 

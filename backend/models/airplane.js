@@ -20,6 +20,12 @@ export default (sequelize, DataTypes) => {
         foreignKey: 'airplaneId',
         onDelete: 'CASCADE',
       });
+
+      // An AirPlane has many Seats
+      this.hasMany(models.Seat, {
+        foreignKey: 'airplaneId',
+        onDelete: 'CASCADE',
+      });
     }
   }
 
@@ -29,7 +35,7 @@ export default (sequelize, DataTypes) => {
       ModelNo: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true, // Ensure model number is unique
+        unique: true,
       },
       capacity: {
         type: DataTypes.INTEGER,
@@ -44,8 +50,8 @@ export default (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: 'AirPlane',
-      tableName: 'AirPlanes', // Ensure this matches your DB schema
-      timestamps: true, // createdAt & updatedAt
+      tableName: 'AirPlanes',
+      timestamps: true,
     }
   );
 
