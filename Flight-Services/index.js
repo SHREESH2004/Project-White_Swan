@@ -4,7 +4,7 @@ configDotenv();
 
 const Port=process.env.PORT;
 app.listen(Port,async () => {
-    console.log("Server running on port",Port);
+    console.log("Final Server running on port",Port);
    /* try {
         const city = await db.City.findByPk(16); 
         const airport=await city.createAirport({name:'Netaji Subhas Airport',code:'NSC1',address:city.name})
