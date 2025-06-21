@@ -1,5 +1,5 @@
 {
-  "name": "white-swan-flight-services",
+  "name": "white-swan-booking-services",
   "version": "1.0.0",
   "description": "Flight booking microservice for the White-Swan project, developed by Shreesh Sanyal.",
   "main": "index.js",
