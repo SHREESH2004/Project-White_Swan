@@ -3,7 +3,7 @@
 import { body, validationResult } from 'express-validator';
 
 // Validation rules for creating a flight
-const validateCreateFlight = [
+export const validateCreateFlight = [
   body('flightNumber')
     .notEmpty().withMessage('Flight number is required')
     .isString().withMessage('Flight number must be a string')
@@ -69,4 +69,36 @@ const validateCreateFlight = [
   },
 ];
 
-export default validateCreateFlight;
+export const validateUpdateSeats = (req, res, next) => {
+  const { flightId, seats, dec } = req.body;
+
+  // Validate flightId
+  if (!flightId || isNaN(Number(flightId))) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid flightId",
+      explanation: "flightId must be a valid number.",
+    });
+  }
+
+  // Validate seats
+  if (!seats || isNaN(Number(seats)) || seats <= 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid seats value",
+      explanation: "seats must be a positive number.",
+    });
+  }
+
+  // Optional: validate 'dec' is a boolean if provided
+ /* if (dec !== undefined && typeof dec !== 'boolean') {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid dec value",
+      explanation: "dec must be a boolean if provided.",
+    });
+  }*/
+
+  next();
+};
+

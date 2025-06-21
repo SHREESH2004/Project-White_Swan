@@ -256,6 +256,56 @@ class FlightService {
             };
         }
     }
+
+    async updateSeats(data) {
+  try {
+    const { flightId, seats, dec = true } = data;
+
+    if (!flightId || isNaN(Number(flightId))) {
+      throw {
+        statusCode: 400,
+        message: "Invalid flight ID",
+        explanation: "flightId must be a valid number.",
+      };
+    }
+
+    if (!seats || isNaN(Number(seats)) || Number(seats) < 1) {
+      throw {
+        statusCode: 400,
+        message: "Invalid seat value",
+        explanation: "seats must be a positive number.",
+      };
+    }
+
+    await this.flightRepo.updateRemainingSeats(flightId, seats, dec);
+
+    const updatedFlight = await db.Flight.findByPk(flightId, {
+      include: [
+        {
+          model: db.AirPlane,
+          as: 'Flight Details',
+          required: true,
+        },
+      ],
+    });
+
+    return {
+      success: true,
+      message: "Seats updated successfully",
+      data: {
+        flightId: updatedFlight.id,
+        totalSeatsAvailable: updatedFlight.totalSeats,
+        AirPlaneName: updatedFlight['Flight Details'].ModelNo,
+      },
+    };
+  } catch (error) {
+    throw {
+      statusCode: error.statusCode || 500,
+      message: error.message || "Unable to update seats",
+      explanation: error.explanation || "Something went wrong while updating flight seats.",
+    };
+  }
+}
 }
 
 export default FlightService;

@@ -78,5 +78,22 @@ async function destroyFlight(req, res) {
     return error_response(res, error);
   }
 }
+const updateSeats = async (req, res) => {
+  try {
+    const result = await flightService.updateSeats(req.body);
+    return res.status(200).json({
+      success: true,
+      message: 'Seats updated successfully',
+      data: result,
+    });
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message,
+      explanation: error.explanation,
+    });
+  }
+};
 
-export { createFlight, getFlight, getAllFlights, destroyFlight };
+
+export { createFlight, getFlight, getAllFlights, destroyFlight ,updateSeats};
