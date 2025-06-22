@@ -70,7 +70,8 @@ export const validateCreateFlight = [
 ];
 
 export const validateUpdateSeats = (req, res, next) => {
-  const { flightId, seats, dec } = req.body;
+  const { flightId, seats } = req.body;
+  let { dec } = req.body;
 
   // Validate flightId
   if (!flightId || isNaN(Number(flightId))) {
@@ -90,15 +91,34 @@ export const validateUpdateSeats = (req, res, next) => {
     });
   }
 
-  // Optional: validate 'dec' is a boolean if provided
- /* if (dec !== undefined && typeof dec !== 'boolean') {
+  // Coerce 'dec' string to boolean if it's a string
+  if (typeof dec === 'string') {
+    if (dec.toLowerCase() === 'true') {
+      dec = true;
+    } else if (dec.toLowerCase() === 'false') {
+      dec = false;
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid dec value",
+        explanation: "dec must be a boolean (true/false).",
+      });
+    }
+  }
+
+  // Validate 'dec' if it's present and not boolean
+  if (dec !== undefined && typeof dec !== 'boolean') {
     return res.status(400).json({
       success: false,
       message: "Invalid dec value",
       explanation: "dec must be a boolean if provided.",
     });
-  }*/
+  }
+
+  // Set coerced value back to req.body
+  req.body.dec = dec;
 
   next();
 };
+
 

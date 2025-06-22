@@ -1,14 +1,11 @@
 'use strict';
 
 import { Model, DataTypes } from 'sequelize';
-import { BookingStatus } from '../utils/common/enum.js'; // Ensure this path is valid
+import { BookingStatus, seatType } from '../utils/common/enum.js'; // Make sure paths are correct
 
 export default (sequelize) => {
   class Booking extends Model {
     static associate(models) {
-      // Define model relationships
-      // Booking.belongsTo(models.User, { foreignKey: 'userid' });
-      // Booking.belongsTo(models.Flight, { foreignKey: 'flightid' });
     }
   }
 
@@ -32,6 +29,16 @@ export default (sequelize) => {
         allowNull: false,
         defaultValue: BookingStatus.INITIATED,
       },
+      seatType: {
+        type: DataTypes.ENUM(
+          seatType.Business,
+          seatType.First_class,
+          seatType.Economy,
+          seatType.Premium_Economy
+        ),
+        allowNull: false,
+        defaultValue: seatType.Economy,
+      },
       noOfSeats: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -52,7 +59,7 @@ export default (sequelize) => {
       sequelize,
       modelName: 'Booking',
       tableName: 'Bookings',
-      timestamps: true, // automatically adds createdAt & updatedAt
+      timestamps: true,
     }
   );
 

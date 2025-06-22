@@ -1,5 +1,7 @@
 'use strict';
-import { BookingStatus } from "../utils/common/enum.js";
+
+import { BookingStatus, seatType } from "../utils/common/enum.js";
+
 /** @type {import('sequelize-cli').Migration} */
 export default {
   async up(queryInterface, Sequelize) {
@@ -28,20 +30,24 @@ export default {
         allowNull: false,
         defaultValue: BookingStatus.INITIATED,
       },
+      seatType: {
+        type: Sequelize.ENUM(
+          seatType.Business,
+          seatType.First_class,
+          seatType.Economy,
+          seatType.Premium_Economy
+        ),
+        allowNull: false,
+        defaultValue: seatType.Economy,
+      },
       noOfSeats: {
         type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 1,
-        validate: {
-          min: 1,
-        },
       },
       totalCost: {
         type: Sequelize.INTEGER,
         allowNull: true,
-        validate: {
-          min: 0,
-        },
       },
       createdAt: {
         allowNull: false,
@@ -53,8 +59,9 @@ export default {
       }
     });
   },
+
   async down(queryInterface, Sequelize) {
-    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_Bookings_status";');
     await queryInterface.dropTable('Bookings');
   }
+
 };
