@@ -13,6 +13,13 @@ async function createBooking(req, res) {
             data: result
         });
     } catch (error) {
+        if (error.code === 'ECONNREFUSED') {
+            return res.status(StatusCodes.SERVICE_UNAVAILABLE).json({
+                success: false,
+                message: "Flight service unavailable",
+                explanation: "Unable to connect to the Flight Service. Please try again later.",
+            });
+        }
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: "Failed to fetch booking",
@@ -20,5 +27,5 @@ async function createBooking(req, res) {
         });
     }
 }
-export {createBooking};
+export { createBooking };
 

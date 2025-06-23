@@ -1,6 +1,7 @@
 import { body, validationResult } from "express-validator";
 import axios from "axios";
 import dotenv from "dotenv";
+import { StatusCodes } from "http-status-codes";
 
 dotenv.config();
 
@@ -30,6 +31,11 @@ export const validateBooking = [
 
         return true;
       } catch (error) {
+        // Handle flight service unavailable
+        if (error.code === 'ECONNREFUSED') {
+          throw new Error("Flight Server under maintenance. PLease try again later");
+        }
+
         if (error.response && error.response.status === 404) {
           throw new Error("Flight not found");
         }
@@ -44,7 +50,12 @@ export const validateBooking = [
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-      return res.status(400).json({
+      // Check if service unavailable is one of the errors
+      const serviceDown = errors.array().some(err =>
+        err.msg.includes("Flight service unavailable")
+      );
+
+      return res.status(serviceDown ? StatusCodes.SERVICE_UNAVAILABLE : StatusCodes.BAD_REQUEST).json({
         success: false,
         message: "Validation failed",
         errors: errors.array().map(err => ({
