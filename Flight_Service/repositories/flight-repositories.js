@@ -7,6 +7,7 @@ export class FlightRepo extends CrudRepo {
   }
 
   async updateRemainingSeats(flightId, seats, dec = true) {
+    const transaction=await db.sequelize.transaction();
     if (dec) {
       return await db.Flight.decrement('totalSeats', {
         by: seats,
