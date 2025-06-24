@@ -79,7 +79,8 @@ export class UserService {
       token: user.token,
     };
   }
-  static async createBooking({ flightId, userId, noOfSeats, seatType }) {
+  static async createBooking({ flightId, noOfSeats, seatType }) {
+    userId=user
     try {
       const response = await axios.post(`${BASE_URL}/create`, {
         flightId,
