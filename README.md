@@ -162,9 +162,9 @@ schedule.scheduleJob('*/10 * * * * *', async () => {
 
 Want to improve the system, report bugs, or request features? Feel free to fork and contribute!
 
-```bash
-git clone https://github.com/your-username/white-swan.git
-cd white-swan
+```bash[
+git clone https://github.com/SHREESH2004/Project-White_Swan.git
+cd Project-White_Swan
 ```
 
 ---
