@@ -211,8 +211,6 @@ class BookingService {
             const fiveMinutesAgo = new Date(Date.now() - 1000 * 300);
 
             const cancelledBookings = await bookingsRepo.cancelOldBookings(fiveMinutesAgo);
-
-            console.log(`${cancelledBookings.length} old bookings cancelled.`);
             return cancelledBookings;
         } catch (error) {
             console.error('Failed to cancel old bookings:', error);
