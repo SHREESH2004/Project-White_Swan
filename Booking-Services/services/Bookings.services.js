@@ -83,8 +83,15 @@ class BookingService {
                     message: "Booking ID doesn't exist",
                 };
             }
-            const Created_date=new Date(bookingDetails.createdAt)
-            
+            const booking_date = new Date(bookingDetails.createdAt)
+            const Current_date = new Date()
+            if (Current_date - booking_date > 300000) {
+                await transaction.rollback();
+                return {
+                    success: false,
+                    message: "Booking Expire",
+                };
+            }
 
             if (bookingDetails.totalCost !== data.totalCost) {
                 await transaction.rollback();
@@ -101,11 +108,11 @@ class BookingService {
                     message: "User ID mismatch",
                 };
             }
-            if(bookingDetails.status=='booked'){
+            if (bookingDetails.status == 'booked') {
                 await transaction.rollback();
-                return{
-                    success:false,
-                    message:"Already booked"
+                return {
+                    success: false,
+                    message: "Already booked"
                 }
             }
 
