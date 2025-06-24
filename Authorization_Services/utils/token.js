@@ -7,6 +7,17 @@ const JWT_EXPIRES_IN = '1h';
 export const generateToken = (payload) => {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 };
+
 export const verifyToken = (token) => {
-  return jwt.verify(token, JWT_SECRET);
+  try {
+    return jwt.verify(token, JWT_SECRET);
+  } catch (err) {
+    // Optional: Log error for debugging
+    console.error('JWT Verification Error:', err.message);
+
+    throw {
+      statusCode: 401,
+      message: 'Invalid or expired token'
+    };
+  }
 };
