@@ -26,8 +26,6 @@ white-swan/
 ├── auth-service/           # Login / Register / JWT
 ├── flight-service/         # Cities, Airports, Flights, Airplanes
 ├── booking-service/        # Bookings and Payments
-├── shared/                 # Common utilities and enums
-├── .env                    # Environment variables
 └── README.md               # You're here!
 ```
 
