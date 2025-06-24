@@ -74,7 +74,7 @@ class BookingService {
 
         try {
             const bookingDetails = await bookingsRepo.get(data.BookingId, {}, { transaction });
-
+            console.log(bookingDetails)
             if (!bookingDetails) {
                 return {
                     success: false,
@@ -91,12 +91,8 @@ class BookingService {
 
             }
             if (Current_date - booking_date > 300000) {
-                await bookingsRepo.update(
-                    data.BookingId,
-                    { status: BookingStatus.CANCELLED },
-                    {},
-                    transaction
-                );
+
+                await this.CancelBooking(data.BookingId)
                 await transaction.commit();
                 return {
                     success: false,
@@ -151,6 +147,51 @@ class BookingService {
             };
         }
     }
+    async CancelBooking(BookingId) {
+        const transaction = await sequelize.transaction();
+        try {
+            const bookingDetails = await bookingsRepo.get(BookingId, {}, { transaction });
+
+            if (!bookingDetails) {
+                await transaction.rollback();
+                throw new Error('Booking not found');
+            }
+
+            if (bookingDetails.status === BookingStatus.CANCELLED) {
+                await transaction.commit();
+                return true; // Already cancelled
+            }
+
+            await axios.patch(UpdateFlightSeatsURL, {
+                flightId: Number(bookingDetails.flightid),
+                seats: Number(bookingDetails.noOfSeats),
+                dec: false
+            });
+
+            await bookingsRepo.update(
+                BookingId,
+                { status: BookingStatus.CANCELLED },
+                {},
+                transaction
+            );
+
+            await transaction.commit();
+            return true;
+
+        } catch (error) {
+            await transaction.rollback();
+            if (error.code === 'ECONNREFUSED') {
+                const customError = new Error("Flight Server under maintenance. Please try again later");
+                customError.statusCode = 503;
+                throw customError;
+            }
+
+            console.error('Error cancelling booking:', error);
+            throw error;
+        }
+    }
+
+
 
 
 

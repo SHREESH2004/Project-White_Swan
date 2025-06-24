@@ -1,14 +1,12 @@
-import db from '../models/index.js'; // Import initialized models
+import db from '../models/index.js'; 
 import { CrudRepo } from './crud-repositories.js';
-
 export class FlightRepo extends CrudRepo {
   constructor() {
-    super(db.Flight); // Use the initialized Flight model
+    super(db.Flight); 
   }
 
   async updateRemainingSeats(flightId, seats, dec = true) {
     const transaction = await db.sequelize.transaction();
-
     try {
       // Lock the flight row for update to prevent race conditions
       await db.Flight.findOne({

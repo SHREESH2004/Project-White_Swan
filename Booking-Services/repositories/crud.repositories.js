@@ -19,7 +19,6 @@ export class CrudRepo {
                 ...options
             });
         } catch (error) {
-            //logger.error('Something went wrong in CrudRepo: destroy', { error });
             throw error;
         }
     }
@@ -28,7 +27,6 @@ export class CrudRepo {
         try {
             return await this.model.findByPk(id, { ...options, transaction });
         } catch (error) {
-            // logger.error('Something went wrong in CrudRepo: get', { error });
             throw error;
         }
     }

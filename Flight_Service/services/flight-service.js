@@ -11,6 +11,7 @@ class FlightService {
         try {
             const flight = await this.flightRepo.create(data);
             return flight;
+
         } catch (error) {
             console.error("Error in FlightService: create", error);
 
@@ -277,8 +278,31 @@ class FlightService {
                 };
             }
 
+            // Fetch current flight details to get maxSeats (initial totalSeats)
+            const flight = await db.Flight.findByPk(flightId);
+            if (!flight) {
+                throw {
+                    statusCode: 404,
+                    message: "Flight not found",
+                    explanation: `No flight found with ID ${flightId}`,
+                };
+            }
+
+            const maxSeats = flight.totalSeats;
+
+            // If incrementing seats, check if new total would exceed maxSeats
+            if (dec === false && (flight.totalSeats + seats) > maxSeats) {
+                throw {
+                    statusCode: 400,
+                    message: "Max limit crossed",
+                    explanation: `Cannot exceed max seats limit of ${maxSeats}.`,
+                };
+            }
+
+            // Now update seats using repo method
             await this.flightRepo.updateRemainingSeats(flightId, seats, dec);
 
+            // Fetch updated flight details including AirPlane info
             const updatedFlight = await db.Flight.findByPk(flightId, {
                 include: [
                     {
@@ -306,6 +330,7 @@ class FlightService {
             };
         }
     }
+
 }
 
 export default FlightService;

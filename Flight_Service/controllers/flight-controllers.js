@@ -20,7 +20,6 @@ async function createFlight(req, res) {
     };
 
     const flight = await flightService.create(flightData);
-
     return success_response(res, "Flight created successfully", flight, 201);
   } catch (error) {
     console.error("Error in controller: createFlight", error.message);

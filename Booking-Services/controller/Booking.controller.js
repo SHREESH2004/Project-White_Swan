@@ -9,7 +9,7 @@ async function createBooking(req, res) {
         const result = await bookingService.createBooking(data);
         return res.status(StatusCodes.CREATED).json({
             success: true,
-            message: "Booking fetched successfully",
+            message: "Booking done successfully",
             data: result
         });
     } catch (error) {
@@ -31,8 +31,9 @@ export async function processPayment(req, res) {
     try {
         const BookingId = Number(req.body.BookingId);
         const totalCost = Number(req.body.totalCost);
-        const userId = Number(req.body.userId); 
+        const userId = Number(req.body.userId); // fallback if no req.user
 
+        // Basic validation
         if (!BookingId || !totalCost || !userId) {
             return res.status(400).json({
                 success: false,
@@ -60,15 +61,24 @@ export async function processPayment(req, res) {
             bookingId: result.bookingId
         });
 
-    } catch (err) {
-        console.error('Controller error:', err);
+    } catch (error) {
+        console.error('Controller error:', error);
+
+        if (error.code === 'ECONNREFUSED') {
+            return res.status(503).json({
+                success: false,
+                message: "Flight Server under maintenance. Please try again later",
+            });
+        }
+
         return res.status(500).json({
             success: false,
             message: "Internal server error",
-            error: err.message
+            error: error.message
         });
     }
 }
+
 
 
 export { createBooking };
