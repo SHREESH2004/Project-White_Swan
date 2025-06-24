@@ -5,7 +5,6 @@ import { BookingsRepo } from "../repositories/Bookings.repositories.js";
 import { configDotenv } from "dotenv";
 import { BookingStatus } from "../utils/common/enum.js";
 import { where } from "sequelize";
-
 configDotenv();
 
 const { sequelize } = db;
@@ -84,6 +83,8 @@ class BookingService {
                     message: "Booking ID doesn't exist",
                 };
             }
+            const Created_date=new Date(bookingDetails.createdAt)
+            
 
             if (bookingDetails.totalCost !== data.totalCost) {
                 await transaction.rollback();
@@ -100,11 +101,18 @@ class BookingService {
                     message: "User ID mismatch",
                 };
             }
+            if(bookingDetails.status=='booked'){
+                await transaction.rollback();
+                return{
+                    success:false,
+                    message:"Already booked"
+                }
+            }
 
             console.log("Payment data validated successfully.");
             await bookingsRepo.update(
                 data.BookingId,
-                { status: "BOOKED" },
+                { status: BookingStatus.BOOKED },
                 {},
                 transaction
             );
