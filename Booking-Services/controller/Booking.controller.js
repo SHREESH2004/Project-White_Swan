@@ -78,6 +78,41 @@ export async function processPayment(req, res) {
         });
     }
 }
+export async function GetAllBooking(req, res) {
+  try {
+    const { userId } = req.query; // ✅ read from query for GET
+
+    if (!userId) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'userId is required',
+      });
+    }
+
+    const result = await bookingService.getBookingsByUserId(userId);
+
+    return res.status(StatusCodes.OK).json({
+      success: true,
+      message: 'Bookings fetched successfully',
+      data: result,
+    });
+  } catch (error) {
+    if (error.code === 'ECONNREFUSED') {
+      return res.status(StatusCodes.SERVICE_UNAVAILABLE).json({
+        success: false,
+        message: 'Flight service unavailable',
+        explanation: 'Unable to connect to the Flight Service. Please try again later.',
+      });
+    }
+
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'Failed to fetch bookings',
+      error: error.message,
+    });
+  }
+}
+
 
 
 

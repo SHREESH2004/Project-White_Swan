@@ -79,8 +79,7 @@ export class UserService {
       token: user.token,
     };
   }
-  static async createBooking({ flightId, noOfSeats, seatType }) {
-    userId=user
+  static async createBooking({ flightId, noOfSeats, userId, seatType }) {
     try {
       const response = await axios.post(`${BASE_URL}/create`, {
         flightId,
@@ -90,6 +89,11 @@ export class UserService {
       });
       return response.data;
     } catch (error) {
+      if (error.code === 'ECONNREFUSED') {
+        const err = new Error('Booking Service is down for maintenance');
+        err.statusCode = StatusCodes.SERVICE_UNAVAILABLE;
+        throw err;
+      }
       console.error('Create Booking Error:', error.response?.data || error.message);
       throw error;
     }
@@ -104,10 +108,33 @@ export class UserService {
       });
       return response.data;
     } catch (error) {
+      if (error.code === 'ECONNREFUSED') {
+        const err = new Error('Booking Service is down for maintenance');
+        err.statusCode = StatusCodes.SERVICE_UNAVAILABLE;
+        throw err;
+      }
       console.error('Payment Error:', error.response?.data || error.message);
       throw error;
     }
   }
+
+  static async GetAllBookings({ userId }) {
+    try {
+      const response = await axios.get(`${BASE_URL}/getall`, {
+        params: { userId }, // ✅ pass as query param
+      });
+      return response.data;
+    } catch (error) {
+      if (error.code === 'ECONNREFUSED') {
+        const err = new Error('Booking Service is down for maintenance');
+        err.statusCode = StatusCodes.SERVICE_UNAVAILABLE;
+        throw err;
+      }
+      console.error('Get All Bookings Error:', error.response?.data || error.message);
+      throw error;
+    }
+  }
+
 }
 
 

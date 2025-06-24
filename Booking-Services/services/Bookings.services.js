@@ -191,6 +191,19 @@ class BookingService {
         }
     }
 
+    async getBookingsByUserId(userId, options = {}, { transaction } = {}) {
+        try {
+            return await bookingsRepo.getAll(
+                { userid: userId }, 
+                [],                 
+                [],                
+                { transaction, ...options }
+            );
+        } catch (error) {
+            console.error('Error fetching bookings by userId:', error);
+            throw error;
+        }
+    }
 
 
 

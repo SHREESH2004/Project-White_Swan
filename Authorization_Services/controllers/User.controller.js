@@ -81,7 +81,7 @@ export class UsersController {
     try {
       const { BookingId, totalCost, userId } = req.body;
 
-      if (!BookingId|| !totalCost || !userId) {
+      if (!BookingId || !totalCost || !userId) {
         return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Missing required payment fields' });
       }
 
@@ -92,11 +92,41 @@ export class UsersController {
         data: result,
       });
     } catch (err) {
+      if (err.code === 'ECONNREFUSED') {
+        return res.status(StatusCodes.SERVICE_UNAVAILABLE).json({
+          message: 'Booking Service is down for maintenance',
+          error: err.message,
+        });
+      }
       return res.status(err.statusCode || 500).json({
         message: err.message || 'Payment processing failed',
         error: err.error || err,
       });
     }
   }
+  static async getAllBookingsController(req, res) {
+    try {
+      const { userId } = req.query; // ✅ GET uses query, not body
+
+      if (!userId) {
+        return res.status(400).json({ success: false, message: 'userId is required' });
+      }
+
+      const bookings = await UserService.GetAllBookings({ userId });
+
+      return res.status(200).json({
+        success: true,
+        message: 'Bookings fetched successfully',
+        data: bookings,
+      });
+    } catch (error) {
+      return res.status(error.statusCode || 500).json({
+        success: false,
+        message: error.message || 'Failed to fetch bookings',
+      });
+    }
+  }
+
+
 
 }
