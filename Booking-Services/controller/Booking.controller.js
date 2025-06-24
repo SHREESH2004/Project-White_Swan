@@ -27,5 +27,49 @@ async function createBooking(req, res) {
         });
     }
 }
+export async function processPayment(req, res) {
+    try {
+        const BookingId = Number(req.body.BookingId);
+        const totalCost = Number(req.body.totalCost);
+        const userId = Number(req.body.userId); 
+
+        if (!BookingId || !totalCost || !userId) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid or missing BookingId, totalCost, or userId"
+            });
+        }
+
+        const data = { BookingId, totalCost, userId };
+
+        console.log("Processing payment with data:", data);
+
+        const result = await bookingService.makePayment(data);
+
+        if (!result.success) {
+            return res.status(400).json({
+                success: false,
+                message: result.message,
+                error: result.error || null
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: result.message,
+            bookingId: result.bookingId
+        });
+
+    } catch (err) {
+        console.error('Controller error:', err);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: err.message
+        });
+    }
+}
+
+
 export { createBooking };
 

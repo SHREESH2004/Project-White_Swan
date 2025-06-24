@@ -4,6 +4,7 @@ import db from "../models/index.js";
 import { BookingsRepo } from "../repositories/Bookings.repositories.js";
 import { configDotenv } from "dotenv";
 import { BookingStatus } from "../utils/common/enum.js";
+import { where } from "sequelize";
 
 configDotenv();
 
@@ -70,6 +71,67 @@ class BookingService {
             throw error;
         }
     }
+    async makePayment(data) {
+        const transaction = await sequelize.transaction();
+
+        try {
+            const bookingDetails = await bookingsRepo.get(data.BookingId, {}, { transaction });
+
+            if (!bookingDetails) {
+                await transaction.rollback();
+                return {
+                    success: false,
+                    message: "Booking ID doesn't exist",
+                };
+            }
+
+            if (bookingDetails.totalCost !== data.totalCost) {
+                await transaction.rollback();
+                return {
+                    success: false,
+                    message: "Total cost mismatch",
+                };
+            }
+
+            if (bookingDetails.userid != data.userId) {
+                await transaction.rollback();
+                return {
+                    success: false,
+                    message: "User ID mismatch",
+                };
+            }
+
+            console.log("Payment data validated successfully.");
+            await bookingsRepo.update(
+                data.BookingId,
+                { status: "BOOKED" },
+                {},
+                transaction
+            );
+
+
+            await transaction.commit();
+
+            return {
+                success: true,
+                message: "Payment processed successfully",
+                bookingId: bookingDetails.id,
+            };
+
+        } catch (error) {
+            await transaction.rollback();
+            console.error("Payment processing error:", error);
+            return {
+                success: false,
+                message: "An error occurred during payment processing",
+                error: error.message,
+            };
+        }
+    }
+
+
+
+
 }
 
 export default BookingService;

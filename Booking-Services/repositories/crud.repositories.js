@@ -24,14 +24,16 @@ export class CrudRepo {
         }
     }
 
-    async get(id, options = {}) {
+    async get(id, options = {}, { transactions: transaction } = {}) {
         try {
-            return await this.model.findByPk(id, options);
+            return await this.model.findByPk(id, { ...options, transaction });
         } catch (error) {
-            //logger.error('Something went wrong in CrudRepo: get', { error });
+            // logger.error('Something went wrong in CrudRepo: get', { error });
             throw error;
         }
     }
+
+
 
     async getAll(filter = {}, sort = [], include = [], options = {}) {
         try {
@@ -47,15 +49,17 @@ export class CrudRepo {
         }
     }
 
-    async update(id, newData, options = {}) {
+    async update(id, newData, options = {}, transaction) {
         try {
             return await this.model.update(newData, {
                 where: { id },
-                ...options
+                ...options,
+                transaction: transaction
             });
         } catch (error) {
             logger.error('Something went wrong in CrudRepo: update', { error });
             throw error;
         }
     }
+
 }
