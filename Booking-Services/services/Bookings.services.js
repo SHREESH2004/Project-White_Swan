@@ -16,7 +16,6 @@ class BookingService {
     async createBooking(data) {
         const transaction = await sequelize.transaction();
         try {
-            // Fetch flight details
             const flightResponse = await axios.get(`${FlightBaseURL}${data.flightId}`);
             const flight = flightResponse.data.data;
             if (data.noOfSeats > flight.availableSeats) {
@@ -77,7 +76,6 @@ class BookingService {
             const bookingDetails = await bookingsRepo.get(data.BookingId, {}, { transaction });
 
             if (!bookingDetails) {
-                await transaction.rollback();
                 return {
                     success: false,
                     message: "Booking ID doesn't exist",
@@ -85,16 +83,28 @@ class BookingService {
             }
             const booking_date = new Date(bookingDetails.createdAt)
             const Current_date = new Date()
-            if (Current_date - booking_date > 300000) {
-                await transaction.rollback();
+            if (bookingDetails.status == BookingStatus.CANCELLED) {
                 return {
                     success: false,
-                    message: "Booking Expire",
+                    message: "Booking Initiated before was cancelled due to booking expiry",
+                };
+
+            }
+            if (Current_date - booking_date > 300000) {
+                await bookingsRepo.update(
+                    data.BookingId,
+                    { status: BookingStatus.CANCELLED },
+                    {},
+                    transaction
+                );
+                await transaction.commit();
+                return {
+                    success: false,
+                    message: "Booking Expired",
                 };
             }
 
             if (bookingDetails.totalCost !== data.totalCost) {
-                await transaction.rollback();
                 return {
                     success: false,
                     message: "Total cost mismatch",
@@ -102,14 +112,12 @@ class BookingService {
             }
 
             if (bookingDetails.userid != data.userId) {
-                await transaction.rollback();
                 return {
                     success: false,
                     message: "User ID mismatch",
                 };
             }
             if (bookingDetails.status == 'booked') {
-                await transaction.rollback();
                 return {
                     success: false,
                     message: "Already booked"
