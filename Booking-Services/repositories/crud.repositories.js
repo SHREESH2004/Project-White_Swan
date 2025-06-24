@@ -1,3 +1,6 @@
+import { where } from "sequelize";
+import { Op } from "sequelize";
+import { BookingStatus } from "../utils/common/enum.js";
 export class CrudRepo {
     constructor(model) {
         this.model = model;
@@ -59,5 +62,18 @@ export class CrudRepo {
             throw error;
         }
     }
+    async cancelOldBookings(cutoffDate) {
+        const oldBookings = await this.model.findAll({
+            where: {
+                createdAt: { [Op.lt]: cutoffDate },
+                status: BookingStatus.INITIATED,
+            },
+        });
 
+        for (const booking of oldBookings) {
+            await booking.update({ status: BookingStatus.CANCELLED });
+        }
+
+        return oldBookings;
+    }
 }

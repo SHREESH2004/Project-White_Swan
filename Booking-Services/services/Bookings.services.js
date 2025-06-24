@@ -5,6 +5,8 @@ import { BookingsRepo } from "../repositories/Bookings.repositories.js";
 import { configDotenv } from "dotenv";
 import { BookingStatus } from "../utils/common/enum.js";
 import { where } from "sequelize";
+import { Op } from "sequelize";
+import { response } from "express";
 configDotenv();
 
 const { sequelize } = db;
@@ -194,9 +196,9 @@ class BookingService {
     async getBookingsByUserId(userId, options = {}, { transaction } = {}) {
         try {
             return await bookingsRepo.getAll(
-                { userid: userId }, 
-                [],                 
-                [],                
+                { userid: userId },
+                [],
+                [],
                 { transaction, ...options }
             );
         } catch (error) {
@@ -204,11 +206,19 @@ class BookingService {
             throw error;
         }
     }
+    async cancelOldBookings() {
+        try {
+            const fiveMinutesAgo = new Date(Date.now() - 1000 * 300);
 
+            const cancelledBookings = await bookingsRepo.cancelOldBookings(fiveMinutesAgo);
 
-
-
-
+            console.log(`${cancelledBookings.length} old bookings cancelled.`);
+            return cancelledBookings;
+        } catch (error) {
+            console.error('Failed to cancel old bookings:', error);
+            return []; 
+        }
+    }
 }
 
 export default BookingService;
