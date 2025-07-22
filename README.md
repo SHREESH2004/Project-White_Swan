@@ -1,7 +1,7 @@
 ## 🕊️ White Swan – Flight Booking Microservices Platform
 
 **White Swan** is a modular and scalable backend system built using **Node.js**, **Express**, and **Sequelize ORM** with a **MySQL** database. The platform powers a complete flight booking ecosystem where:
-
+AI AGENTS code is https://github.com/SHREESH2004/AI-Agent-for-White_Swan
 * Admins can manage cities, airports, airplanes, and flights.
 * Users can register, log in, browse flights, and make bookings with secure payments.
 * All services are separated into independent microservices for scalability and clarity.
